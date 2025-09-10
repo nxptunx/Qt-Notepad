@@ -1,5 +1,5 @@
 '''
- * Copyright (C) 2023  nxptunx <anvarbilmemek@gmail.com>
+ * Copyright (C) 2025  nxptunx <anvarbilmemek@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -105,6 +105,10 @@ class MainWindow(QMainWindow):
 
     def _create_actions(self):
         # File
+        self.new_action = QAction("New", self)
+        self.new_action.setShortcut(QKeySequence("Ctrl+N"))
+        self.new_action.triggered.connect(self.new_file)
+
         self.open_action = QAction("Open", self)
         self.open_action.setShortcut(QKeySequence.Open)
         self.open_action.triggered.connect(self.open_file)
@@ -131,7 +135,7 @@ class MainWindow(QMainWindow):
         self.redo_action.triggered.connect(self.editor.redo)
 
         self.cut_action = QAction("Cut", self)
-        self.cut_action.setShortcut(QKeySequence.Cut)
+        self.cut_action.setShortcut(QKeySequence.Cut)   
         self.cut_action.triggered.connect(self.editor.cut)
 
         self.copy_action = QAction("Copy", self)
@@ -192,11 +196,13 @@ class MainWindow(QMainWindow):
         menubar = self.menuBar()
         #File Menu
         file_menu = menubar.addMenu("File")
+        file_menu.addAction(self.new_action)
         file_menu.addAction(self.open_action)
         file_menu.addAction(self.save_action)
         file_menu.addAction(self.save_as_action)
         file_menu.addSeparator()
         file_menu.addAction(self.exit_action)
+        
         #Edit Menu
         edit_menu = menubar.addMenu("Edit")
         edit_menu.addAction(self.undo_action)
@@ -218,16 +224,89 @@ class MainWindow(QMainWindow):
         insert_menu.addAction(self.insert_signature)
         #View Menu
         view_menu = menubar.addMenu("View")
-        view_menu.addAction(self.fullscreen_action)
         view_menu.addAction(self.zoomIn_action)
         view_menu.addAction(self.zoomOut_action)
         view_menu.addAction(self.cursor_disable_action)
-        
-        menubar.addMenu("Tools")
-        menubar.addMenu("Window")
+        #Window Menu
+        window_menu = menubar.addMenu("Window")
+        window_menu.addAction(self.fullscreen_action)
+
+        #Placeholder menus
+        tools_menu = menubar.addMenu("Tools")
         menubar.addMenu("Settings")
 
     # File handling
+    def new_file(self):
+        # Check if current file has unsaved changes
+        if self.has_unsaved_changes():
+            response = QMessageBox.question(
+                self, 
+                'Unsaved Changes',
+                'The current file has unsaved changes. Do you want to save them before creating a new file?',
+                QMessageBox.StandardButton.Save | 
+                QMessageBox.StandardButton.Discard | 
+                QMessageBox.StandardButton.Cancel
+            )
+            
+            if response == QMessageBox.StandardButton.Save:
+                self.save_file()
+                # If save was cancelled, don't create new file
+                if self.current_file is None:
+                    return
+            elif response == QMessageBox.StandardButton.Cancel:
+                return
+            # If Discard, just continue
+        
+        # Create a new empty file
+        self.editor.clear()
+        self.current_file = None
+        self.setWindowTitle("Untitled - Text Editor")
+
+# Helper method to check for unsaved changes
+    def new_file(self):
+    # Check if current file has unsaved changes
+        if self.has_unsaved_changes():
+            response = QMessageBox.question(
+                self, 
+                'Unsaved Changes',
+                'The current file has unsaved changes. Do you want to save them before creating a new file?',
+                QMessageBox.StandardButton.Save | 
+                QMessageBox.StandardButton.Discard | 
+                QMessageBox.StandardButton.Cancel
+            )
+            
+            if response == QMessageBox.StandardButton.Save:
+                self.save_file()
+                # If save was cancelled, don't create new file
+                if self.current_file is None:
+                    return
+            elif response == QMessageBox.StandardButton.Cancel:
+                return
+            # If Discard, just continue
+        
+        # Create a new empty file
+        self.editor.clear()
+        self.current_file = None
+        self.setWindowTitle("Untitled - Text Editor")
+
+    # Helper method to check for unsaved changes
+    def has_unsaved_changes(self):
+        """
+        Check if the current text differs from the saved version
+        """
+        if not self.current_file:
+            # If no file is loaded, check if editor has text
+            return bool(self.editor.toPlainText().strip())
+        
+        try:
+            with open(self.current_file, "r", encoding='utf-8') as file:
+                saved_content = file.read()
+            current_content = self.editor.toPlainText()
+            return saved_content != current_content
+        except Exception:
+            # If file can't be read, assume there are changes
+            return True
+#Note: the save mechanics are a bit cursed cuz i was too dizzy when writing it,it will get fixed in future versions
     def open_file(self):
         path, _ = QFileDialog.getOpenFileName(
             self, 'Open file', '', "Text documents (*.txt);;All files (*.*)")
@@ -269,6 +348,10 @@ class MainWindow(QMainWindow):
             self.showFullScreen()
         else:
             self.showNormal()
+
+
+
+            
     #zoom in and out
     def zoomIn(self):
         font = self.editor.font()
@@ -284,6 +367,11 @@ class MainWindow(QMainWindow):
             current_size = 12  # fallback default
         font.setPointSize(current_size - 1)
         self.editor.setFont(font)
+
+
+
+
+
     def cursor_disable(self, checked):
         if checked:
             self.editor.setCursorWidth(0)  # Hide cursor
@@ -308,7 +396,7 @@ class MainWindow(QMainWindow):
     def insert_name_func(self):
         name = "Your Name Here"
         self.editor.textCursor().insertText(name)
-
+          
     def insert_signature_func(self):
         signature = "\n\n--\nBest regards,\nYour Name"
         self.editor.textCursor().insertText(signature)
