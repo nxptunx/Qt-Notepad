@@ -27,71 +27,6 @@ from PySide6.QtWidgets import (
 from PySide6.QtGui import QKeySequence, QAction
 
 
-class FindReplaceDialog(QDialog):
-    def __init__(self, editor, parent=None):
-        super().__init__(parent)
-        self.editor = editor
-        self.setWindowTitle("Find and Replace")
-
-        self.find_input = QLineEdit()
-        self.replace_input = QLineEdit()
-        find_label = QLabel("Find:")
-        replace_label = QLabel("Replace with:")
-
-        find_button = QPushButton("Find Next")
-        replace_button = QPushButton("Replace")
-        replace_all_button = QPushButton("Replace All")
-
-        layout = QVBoxLayout()
-        layout.addLayout(self._create_input_row(find_label, self.find_input))
-        layout.addLayout(self._create_input_row(replace_label, self.replace_input))
-
-        button_layout = QHBoxLayout()
-        button_layout.addWidget(find_button)
-        button_layout.addWidget(replace_button)
-        button_layout.addWidget(replace_all_button)
-        layout.addLayout(button_layout)
-
-        self.setLayout(layout)
-
-        find_button.clicked.connect(self.find_next)
-        replace_button.clicked.connect(self.replace_one)
-        replace_all_button.clicked.connect(self.replace_all)
-
-    def _create_input_row(self, label, line_edit):
-        layout = QHBoxLayout()
-        layout.addWidget(label)
-        layout.addWidget(line_edit)
-        return layout
-
-    def find_next(self):
-        cursor = self.editor.textCursor()
-        text_to_find = self.find_input.text()
-        found = self.editor.find(text_to_find)
-        if not found:
-            cursor.movePosition(cursor.Start)
-            if not self.editor.find(text_to_find):
-                QMessageBox.information(self, "Find", "Text not found.")
-
-    def replace_one(self):
-        cursor = self.editor.textCursor()
-        if cursor.hasSelection():
-            cursor.insertText(self.replace_input.text())
-        self.find_next()
-
-    def replace_all(self):
-        text = self.editor.toPlainText()
-        find_text = self.find_input.text()
-        replace_text = self.replace_input.text()
-        count = text.count(find_text)
-        if count == 0:
-            QMessageBox.information(self, "Replace All", "Text not found.")
-            return
-        new_text = text.replace(find_text, replace_text)
-        self.editor.setPlainText(new_text)
-        QMessageBox.information(self, "Replace All", f"Replaced {count} occurrences.")
-
-
 class MainWindow(QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -339,6 +274,73 @@ class MainWindow(QMainWindow):
                 QMessageBox.warning(self, "Error", f"Error saving file:\n{e}")
 
     # Dialogs and actions
+
+
+class FindReplaceDialog(QDialog):
+    def __init__(self, editor, parent=None):
+        super().__init__(parent)
+        self.editor = editor
+        self.setWindowTitle("Find and Replace")
+
+        self.find_input = QLineEdit()
+        self.replace_input = QLineEdit()
+        find_label = QLabel("Find:")
+        replace_label = QLabel("Replace with:")
+
+        find_button = QPushButton("Find Next")
+        replace_button = QPushButton("Replace")
+        replace_all_button = QPushButton("Replace All")
+
+        layout = QVBoxLayout()
+        layout.addLayout(self._create_input_row(find_label, self.find_input))
+        layout.addLayout(self._create_input_row(replace_label, self.replace_input))
+
+        button_layout = QHBoxLayout()
+        button_layout.addWidget(find_button)
+        button_layout.addWidget(replace_button)
+        button_layout.addWidget(replace_all_button)
+        layout.addLayout(button_layout)
+
+        self.setLayout(layout)
+
+        find_button.clicked.connect(self.find_next)
+        replace_button.clicked.connect(self.replace_one)
+        replace_all_button.clicked.connect(self.replace_all)
+
+    def _create_input_row(self, label, line_edit):
+        layout = QHBoxLayout()
+        layout.addWidget(label)
+        layout.addWidget(line_edit)
+        return layout
+
+    def find_next(self):
+        cursor = self.editor.textCursor()
+        text_to_find = self.find_input.text()
+        found = self.editor.find(text_to_find)
+        if not found:
+            cursor.movePosition(cursor.Start)
+            if not self.editor.find(text_to_find):
+                QMessageBox.information(self, "Find", "Text not found.")
+
+    def replace_one(self):
+        cursor = self.editor.textCursor()
+        if cursor.hasSelection():
+            cursor.insertText(self.replace_input.text())
+        self.find_next()
+
+    def replace_all(self):
+        text = self.editor.toPlainText()
+        find_text = self.find_input.text()
+        replace_text = self.replace_input.text()
+        count = text.count(find_text)
+        if count == 0:
+            QMessageBox.information(self, "Replace All", "Text not found.")
+            return
+        new_text = text.replace(find_text, replace_text)
+        self.editor.setPlainText(new_text)
+        QMessageBox.information(self, "Replace All", f"Replaced {count} occurrences.")
+
+
     def show_find_replace_dialog(self):
         dialog = FindReplaceDialog(self.editor, self)
         dialog.exec()
