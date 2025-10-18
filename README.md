@@ -9,7 +9,6 @@
 Qt-Notepad is a simple, lightweight notepad application built using Python and Qt.  
 It's currently a work in progress — feel free to report bugs by opening an [issue](https://github.com/nxptunx/Qt-Notepad/issues) or contribute by creating a [pull request](https://github.com/nxptunx/Qt-Notepad/pulls).
 
-
 ## License
 
 This project is licensed under the **GNU General Public License v3.0**.
@@ -27,7 +26,8 @@ We welcome contributions from everyone! Whether you're fixing bugs, adding new f
 1. **Fork the Repository**  
    Click the **Fork** button at the top-right of this page to create your own copy of the project.
 
-2. **Clone Your Fork**  
+2. **Clone Your Fork**
+
    ```bash
    git clone https://github.com/your-username/Qt-Notepad.git
    cd Qt-Notepad
@@ -35,6 +35,7 @@ We welcome contributions from everyone! Whether you're fixing bugs, adding new f
 
 3. **Create a New Branch**  
    Create a branch for your changes:
+
    ```bash
    git checkout -b my-feature-or-bugfix
    ```
@@ -42,7 +43,8 @@ We welcome contributions from everyone! Whether you're fixing bugs, adding new f
 4. **Make Your Changes**  
    Make sure to test thoroughly. Keep commits small and focused.
 
-5. **Commit and Push**  
+5. **Commit and Push**
+
    ```bash
    git add .
    git commit -m "Add a clear and concise commit message"
@@ -65,3 +67,7 @@ We welcome contributions from everyone! Whether you're fixing bugs, adding new f
 
 - Use the [Issues](https://github.com/nxptunx/Qt-Notepad/issues) tab to report bugs or suggest features.
 - Please include details: OS, Python version, steps to reproduce, screenshots (if applicable), and logs.
+
+# UPDATE
+
+i dont have free time because of school so i wont be continuing this project,BUT i will check pull requests from time to time,nxptunx loves yall 💙
