@@ -13,7 +13,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- '''
+'''
 
 # This Python file uses the following encoding: utf-8
 
@@ -70,7 +70,7 @@ class MainWindow(QMainWindow):
         self.redo_action.triggered.connect(self.editor.redo)
 
         self.cut_action = QAction("Cut", self)
-        self.cut_action.setShortcut(QKeySequence.Cut)   
+        self.cut_action.setShortcut(QKeySequence.Cut)
         self.cut_action.triggered.connect(self.editor.cut)
 
         self.copy_action = QAction("Copy", self)
@@ -112,7 +112,6 @@ class MainWindow(QMainWindow):
         self.fullscreen_action.setCheckable(True)
         self.fullscreen_action.triggered.connect(self.toggle_fullscreen)
 
-
         self.zoomIn_action = QAction("Zoom In", self)
         self.zoomIn_action.setShortcut("Ctrl++")
         self.zoomIn_action.triggered.connect(self.zoomIn)
@@ -126,10 +125,10 @@ class MainWindow(QMainWindow):
         self.cursor_disable_action.setShortcut("Ctrl+M")
         self.cursor_disable_action.triggered.connect(self.cursor_disable)
 
-
     def _create_menu_bar(self):
         menubar = self.menuBar()
-        #File Menu
+
+        # File Menu
         file_menu = menubar.addMenu("File")
         file_menu.addAction(self.new_action)
         file_menu.addAction(self.open_action)
@@ -137,8 +136,8 @@ class MainWindow(QMainWindow):
         file_menu.addAction(self.save_as_action)
         file_menu.addSeparator()
         file_menu.addAction(self.exit_action)
-        
-        #Edit Menu
+
+        # Edit Menu
         edit_menu = menubar.addMenu("Edit")
         edit_menu.addAction(self.undo_action)
         edit_menu.addAction(self.redo_action)
@@ -149,7 +148,8 @@ class MainWindow(QMainWindow):
         edit_menu.addSeparator()
         edit_menu.addAction(self.select_all_action)
         edit_menu.addAction(self.find_replace_action)
-        #Insert Menu
+
+        # Insert Menu
         insert_menu = menubar.addMenu("Insert")
         insert_menu.addAction(self.insert_datetime_cursor)
         insert_menu.addAction(self.insert_datetime_top)
@@ -157,91 +157,55 @@ class MainWindow(QMainWindow):
         insert_menu.addSeparator()
         insert_menu.addAction(self.insert_name)
         insert_menu.addAction(self.insert_signature)
-        #View Menu
+
+        # View Menu
         view_menu = menubar.addMenu("View")
         view_menu.addAction(self.zoomIn_action)
         view_menu.addAction(self.zoomOut_action)
         view_menu.addAction(self.cursor_disable_action)
-        #Window Menu
+
+        # Window Menu
         window_menu = menubar.addMenu("Window")
         window_menu.addAction(self.fullscreen_action)
 
-        #Placeholder menus
-        tools_menu = menubar.addMenu("Tools")
+        # Placeholder Menus
+        menubar.addMenu("Tools")
         menubar.addMenu("Settings")
 
     # File handling
     def new_file(self):
-        # Check if current file has unsaved changes
         if self.has_unsaved_changes():
             response = QMessageBox.question(
-                self, 
+                self,
                 'Unsaved Changes',
                 'The current file has unsaved changes. Do you want to save them before creating a new file?',
-                QMessageBox.StandardButton.Save | 
-                QMessageBox.StandardButton.Discard | 
+                QMessageBox.StandardButton.Save |
+                QMessageBox.StandardButton.Discard |
                 QMessageBox.StandardButton.Cancel
             )
-            
+
             if response == QMessageBox.StandardButton.Save:
                 self.save_file()
-                # If save was cancelled, don't create new file
                 if self.current_file is None:
                     return
             elif response == QMessageBox.StandardButton.Cancel:
                 return
-            # If Discard, just continue
-        
-        # Create a new empty file
+
         self.editor.clear()
         self.current_file = None
         self.setWindowTitle("Untitled - Text Editor")
 
-# Helper method to check for unsaved changes
-    def new_file(self):
-    # Check if current file has unsaved changes
-        if self.has_unsaved_changes():
-            response = QMessageBox.question(
-                self, 
-                'Unsaved Changes',
-                'The current file has unsaved changes. Do you want to save them before creating a new file?',
-                QMessageBox.StandardButton.Save | 
-                QMessageBox.StandardButton.Discard | 
-                QMessageBox.StandardButton.Cancel
-            )
-            
-            if response == QMessageBox.StandardButton.Save:
-                self.save_file()
-                # If save was cancelled, don't create new file
-                if self.current_file is None:
-                    return
-            elif response == QMessageBox.StandardButton.Cancel:
-                return
-            # If Discard, just continue
-        
-        # Create a new empty file
-        self.editor.clear()
-        self.current_file = None
-        self.setWindowTitle("Untitled - Text Editor")
-
-    # Helper method to check for unsaved changes
     def has_unsaved_changes(self):
-        """
-        Check if the current text differs from the saved version
-        """
         if not self.current_file:
-            # If no file is loaded, check if editor has text
             return bool(self.editor.toPlainText().strip())
-        
         try:
             with open(self.current_file, "r", encoding='utf-8') as file:
                 saved_content = file.read()
             current_content = self.editor.toPlainText()
             return saved_content != current_content
         except Exception:
-            # If file can't be read, assume there are changes
             return True
-#Note: the save mechanics are a bit cursed cuz i was too dizzy when writing it,it will get fixed in future versions
+
     def open_file(self):
         path, _ = QFileDialog.getOpenFileName(
             self, 'Open file', '', "Text documents (*.txt);;All files (*.*)")
@@ -273,7 +237,53 @@ class MainWindow(QMainWindow):
             except Exception as e:
                 QMessageBox.warning(self, "Error", f"Error saving file:\n{e}")
 
-    # Dialogs and actions
+    # === FIXED: This method now belongs to MainWindow ===
+    def show_find_replace_dialog(self):
+        dialog = FindReplaceDialog(self.editor, self)
+        dialog.exec()
+
+    def toggle_fullscreen(self, checked):
+        if checked:
+            self.showFullScreen()
+        else:
+            self.showNormal()
+
+    # Zoom
+    def zoomIn(self):
+        font = self.editor.font()
+        current_size = font.pointSize() or 12
+        font.setPointSize(current_size + 1)
+        self.editor.setFont(font)
+
+    def zoomOut(self):
+        font = self.editor.font()
+        current_size = font.pointSize() or 12
+        font.setPointSize(current_size - 1)
+        self.editor.setFont(font)
+
+    # Cursor toggle
+    def cursor_disable(self, checked):
+        self.editor.setCursorWidth(0 if checked else 1)
+
+    # Insert actions
+    def insert_datetime_cursor_pos(self):
+        now = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+        self.editor.textCursor().insertText(now)
+
+    def insert_datetime_top_pos(self):
+        now = datetime.now().strftime("%d-%m-%Y %H:%M:%S\n")
+        self.editor.setPlainText(now + self.editor.toPlainText())
+
+    def insert_datetime_bottom_pos(self):
+        now = "\n" + datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+        self.editor.setPlainText(self.editor.toPlainText() + now)
+
+    def insert_name_func(self):
+        self.editor.textCursor().insertText("Your Name Here")
+
+    def insert_signature_func(self):
+        signature = "\n\n--\nBest regards,\nYour Name"
+        self.editor.textCursor().insertText(signature)
 
 
 class FindReplaceDialog(QDialog):
@@ -339,69 +349,6 @@ class FindReplaceDialog(QDialog):
         new_text = text.replace(find_text, replace_text)
         self.editor.setPlainText(new_text)
         QMessageBox.information(self, "Replace All", f"Replaced {count} occurrences.")
-
-
-    def show_find_replace_dialog(self):
-        dialog = FindReplaceDialog(self.editor, self)
-        dialog.exec()
-
-    def toggle_fullscreen(self, checked):
-        if checked:
-            self.showFullScreen()
-        else:
-            self.showNormal()
-
-
-
-            
-    #zoom in and out
-    def zoomIn(self):
-        font = self.editor.font()
-        current_size = font.pointSize()
-        if current_size <= 0:
-            current_size = 12  # fallback default
-        font.setPointSize(current_size + 1)
-        self.editor.setFont(font)
-    def zoomOut(self):
-        font = self.editor.font()
-        current_size = font.pointSize()
-        if current_size <= 0:
-            current_size = 12  # fallback default
-        font.setPointSize(current_size - 1)
-        self.editor.setFont(font)
-
-
-
-
-
-    def cursor_disable(self, checked):
-        if checked:
-            self.editor.setCursorWidth(0)  # Hide cursor
-        else:
-            self.editor.setCursorWidth(1)  # Show cursor
-
-        
-
-    # Insert methods
-    def insert_datetime_cursor_pos(self):
-        now = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
-        self.editor.textCursor().insertText(now)
-
-    def insert_datetime_top_pos(self):
-        now = datetime.now().strftime("%d-%m-%Y %H:%M:%S\n")
-        self.editor.setPlainText(now + self.editor.toPlainText())
-
-    def insert_datetime_bottom_pos(self):
-        now = "\n" + datetime.now().strftime("%d-%m-%Y %H:%M:%S")
-        self.editor.setPlainText(self.editor.toPlainText() + now)
-
-    def insert_name_func(self):
-        name = "Your Name Here"
-        self.editor.textCursor().insertText(name)
-          
-    def insert_signature_func(self):
-        signature = "\n\n--\nBest regards,\nYour Name"
-        self.editor.textCursor().insertText(signature)
 
 
 if __name__ == "__main__":
