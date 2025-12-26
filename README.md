@@ -5,6 +5,7 @@
 ![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey)
 ![Status](https://img.shields.io/badge/Status-STOPPED-red)
 ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)
+![Qt](https://img.shields.io/badge/Framework-Qt-41CD52?logo=qt&logoColor=white)
 
 Qt-Notepad is a simple, lightweight notepad application built using Python and Qt.  
 It's currently a work in progress — feel free to report bugs by opening an [issue](https://github.com/nxptunx/Qt-Notepad/issues) or contribute by creating a [pull request](https://github.com/nxptunx/Qt-Notepad/pulls).
