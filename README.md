@@ -3,7 +3,7 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 ![Python](https://img.shields.io/badge/Python-3.8%2B-blue)
 ![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey)
-![Status](https://img.shields.io/badge/Status-WIP-orange)
+![Status](https://img.shields.io/badge/Status-STOPPED-red)
 ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)
 
 Qt-Notepad is a simple, lightweight notepad application built using Python and Qt.  
